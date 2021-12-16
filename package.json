@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Ultre00/adventofcode2021/issues"
   },
-  "homepage": "https://github.com/Ultre00/adventofcode2021#readme"
+  "homepage": "https://github.com/Ultre00/adventofcode2021#readme",
+  "dependencies": {
+    "jimp": "^0.16.1"
+  }
 }

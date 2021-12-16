@@ -1,5 +1,6 @@
 const { getInput } = require("../shared");
 const raw = getInput("15/input.txt");
+const Jimp = require("jimp");
 
 let data = raw
   .split("\r\n")
@@ -15,6 +16,31 @@ let map = new Map([
     },
   ],
 ]);
+
+const createImage = (name) => {
+  let image = new Jimp(data.length, data.length, function (err, image) {
+    if (err) throw err;
+
+    const max = [...map.values()].reduce(
+      (max, { risk }) => (risk > max ? risk : max),
+      0
+    );
+    for (let y = 0; y < data.length; y++) {
+      for (let x = 0; x < data.length; x++) {
+        const { risk } = map.get(`${x}.${y}`);
+        const val = Math.round(Math.abs(255 - (risk / max) * 255))
+          .toString(16)
+          .padStart(2, "0");
+        const color = parseInt(`${val}${val}${val}ff`, 16);
+        image.setPixelColor(color, x, y);
+      }
+    }
+
+    image.write(`15/${name}.png`, (err) => {
+      if (err) throw err;
+    });
+  });
+};
 
 const tryAddCoordinate = (x, y, coords) => {
   if (
@@ -62,8 +88,6 @@ const getEligibleCoords = () => {
 };
 
 const fillNextShortestRoute = () => {
-  console.log(map.size);
-
   let scores = [];
   for (const coord of getEligibleCoords()) {
     scores.push({ ...coord, risk: riskValue(coord) });
@@ -76,10 +100,11 @@ const fillNextShortestRoute = () => {
 };
 
 // part 1
-while (!map.has("0.0")) {
+while (map.size != data.length * data.length) {
   fillNextShortestRoute();
 }
 console.log("part1:", map.get("0.0"));
+createImage("part1");
 
 //part 2
 let incrementedData = new Array(5).fill().map((m) => new Array(5).fill());
@@ -119,7 +144,8 @@ map = new Map([
     },
   ],
 ]);
-while (!map.has("0.0")) {
+while (!map.size != data.length * data.length) {
   fillNextShortestRoute();
 }
 console.log("part2:", map.get("0.0"));
+createImage("part2");
